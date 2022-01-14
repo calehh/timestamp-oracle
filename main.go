@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/mux"
 	"gopkg.in/urfave/cli.v1"
+	"io/ioutil"
 	"math/big"
 	"net/http"
 	"os"
@@ -38,6 +39,12 @@ var (
 		Usage: "restful rpc port",
 		Value: "3333",
 	}
+
+	fileFlag = cli.StringFlag{
+		Name:  "private",
+		Usage: "private key file path",
+		Value: "./private.txt",
+	}
 )
 
 var PrivateKeyStr = "db96ee03632eb01fed47f061d2ba383ad8231844d51fc94d9a938d2476e7fd53"
@@ -48,6 +55,7 @@ func init() {
 	app.Action = Start
 	app.Flags = []cli.Flag{
 		portFlag,
+		fileFlag,
 	}
 
 	cli.CommandHelpTemplate = OriginCommandHelpTemplate
@@ -67,6 +75,22 @@ type res struct {
 
 func Start(ctx *cli.Context) {
 	log.Info("starting oracle")
+	if ctx.IsSet(fileFlag.Name) {
+		log.Info("loading key")
+		filePath := ctx.String(fileFlag.Name)
+		b, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			panic(err)
+		} else {
+			PrivateKeyStr = string(b)
+		}
+	}
+
+	pri, err := crypto.HexToECDSA(PrivateKeyStr)
+	if err != nil {
+		panic(err)
+	}
+	log.Info("auth address", "address", crypto.PubkeyToAddress(pri.PublicKey).String())
 
 	log.Info("start restful server")
 	r := mux.NewRouter()
@@ -100,7 +124,7 @@ func Start(ctx *cli.Context) {
 		address = "0.0.0.0:8547"
 	}
 	log.Info("address", "url", address)
-	err := http.ListenAndServe(address, r)
+	err = http.ListenAndServe(address, r)
 	if err != nil {
 		utils.Fatalf("http listen err", "err", err)
 	}

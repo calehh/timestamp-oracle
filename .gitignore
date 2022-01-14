@@ -1,3 +1,4 @@
 abigen
 timestamp-oracle
 *.log
+*.txt
