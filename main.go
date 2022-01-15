@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/cmd/utils"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/mux"
@@ -70,7 +71,7 @@ func main() {
 
 type res struct {
 	Timestamp string `json:"timestamp"`
-	Sig       []byte `json:"sig"`
+	Sig       string `json:"sig"`
 }
 
 func Start(ctx *cli.Context) {
@@ -106,7 +107,7 @@ func Start(ctx *cli.Context) {
 		}
 		re, err := json.Marshal(res{
 			Timestamp: timestamp,
-			Sig:       sig,
+			Sig:       "0x"+ common.Bytes2Hex(sig),
 		})
 		if err != nil {
 			log.Error("marshal response err", "err", err)
