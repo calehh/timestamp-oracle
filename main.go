@@ -96,7 +96,7 @@ func Start(ctx *cli.Context) {
 	log.Info("start restful server")
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+	r.HandleFunc("/timestampms", func(writer http.ResponseWriter, request *http.Request) {
 		timestamp, sig, err := SignTimeStamp()
 		if err != nil {
 			_, e := writer.Write([]byte{})
