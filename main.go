@@ -107,7 +107,7 @@ func Start(ctx *cli.Context) {
 		}
 		re, err := json.Marshal(res{
 			Timestamp: timestamp,
-			Sig:       "0x"+ common.Bytes2Hex(sig),
+			Sig:       "0x" + common.Bytes2Hex(sig),
 		})
 		if err != nil {
 			log.Error("marshal response err", "err", err)
@@ -160,8 +160,8 @@ func SignTimeStamp() (string, []byte, error) {
 			Type: uintTy,
 		},
 	}
-
-	timestamp := big.NewInt(time.Now().Unix())
+	unixMili := time.Now().UnixNano() / 1000000
+	timestamp := big.NewInt(unixMili)
 
 	msg, err := argument.Pack(timestamp)
 	if err != nil {
